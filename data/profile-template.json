@@ -1,0 +1,11 @@
+{
+  "name": "",
+  "education": [
+    { "school": "", "degree": "", "year": "" }
+  ],
+  "experience": [
+    { "company": "", "title": "", "period": "", "desc": "" }
+  ],
+  "photo": "/images/profile.jpg",
+  "bio": ""
+}

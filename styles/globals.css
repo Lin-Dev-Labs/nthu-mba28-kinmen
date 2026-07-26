@@ -1,0 +1,181 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  color: #1a1a1a;
+  background: #fafafa;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: #1a3a5c;
+}
+
+.site-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.site-nav a:hover {
+  text-decoration: underline;
+}
+
+.site-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+form label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+fieldset {
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.list-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.list-row input {
+  flex: 1;
+  min-width: 100px;
+}
+
+.photo-preview {
+  max-width: 150px;
+  display: block;
+  margin-top: 0.5rem;
+  border-radius: 6px;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.course-card {
+  display: block;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+}
+
+.course-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.course-card-week {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.instructor {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.instructor img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.photo-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.lightbox-overlay,
+.pdf-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.lightbox-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.pdf-modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-modal-frame {
+  flex: 1;
+  border: none;
+  width: 100%;
+}
+
+.pdf-modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.pdf-modal-download {
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.certificate-image {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.save-indicator {
+  color: #2a7a2a;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #b00020;
+}
