@@ -46,13 +46,29 @@ images/PDFs break specifically in the deployed GitHub Pages build while working 
 is just adding a new JSON file, no code changes needed (see schema in the spec doc). This only
 works server-side at build time; `/data` is never served to the browser.
 
-**Runtime-fetchable assets live in `/public`, not `/data`.** This is a deliberate deviation
-from the original spec doc (which put reports under `/data/reports/`): group-report PDFs go in
-`public/reports/course-XX-*.pdf` (filename must start with the course slug, e.g. `course-01`),
-graduation certificate/thesis go in `public/graduation/`, course photos go in
-`public/images/courses/` and are referenced by path in the course JSON's `photos` array.
-`pages/courses/[slug].js`, `pages/download.js`, and `pages/graduation.js` all scan these
-directories with `fs.readdirSync` inside `getStaticProps` to build their file lists.
+**Runtime-fetchable *shared* assets live in `/public`, not `/data`.** This is a deliberate
+deviation from the original spec doc (which put reports under `/data/reports/`): group-report
+PDFs go in `public/reports/course-XX-*.pdf` (filename must start with the course slug, e.g.
+`course-01`), course photos go in `public/images/courses/` and are referenced by path in the
+course JSON's `photos` array. `pages/courses/[slug].js` and `pages/download.js` scan these
+directories with `fs.readdirSync` inside `getStaticProps` to build their file lists. These are
+genuinely shared, cohort-wide content — one upload (by the repo owner) serves everyone.
+
+**Graduation certificate/thesis are per-student, NOT shared — do not put them in `/public`.**
+Initial design mistakenly treated these like group reports (a shared `public/graduation/`
+folder scanned at build time); that's wrong because every student has their own individual
+diploma and thesis, and committing them to the public repo would (a) expose personal data
+(ID numbers, birthdates on diplomas) to the whole internet and (b) make no sense for a shared
+site to only show one person's certificate. Corrected design: `lib/GraduationContext.js` is a
+React Context (provided in `pages/_app.js`, wrapping the whole app) holding `{ certificate:
+{dataUrl, isPng}, thesis: {bytes, name} }` **in memory only** — `pages/graduation.js` lets a
+student upload their own files via `<input type="file">` (converted with `FileReader`), preview
+them, and that state is then read directly by `pages/download.js` when building the PDF
+(`components/PdfGenerator.jsx`'s `generatePersonalizedPdf` takes `graduationCertificate`/
+`graduationThesis` as raw data, not a fetchable path). Nothing here touches localStorage or the
+network — it resets on page reload by design, which is fine since it's a one-sitting
+upload-then-generate flow. Do not "fix" this by trying to persist it (e.g. to localStorage) —
+thesis PDFs can be several MB and would risk hitting localStorage's quota.
 
 **Two separate PDF concerns, don't conflate them:**
 - *Online preview* (`components/PdfModal.jsx`): a plain `<iframe>` pointing at the static PDF

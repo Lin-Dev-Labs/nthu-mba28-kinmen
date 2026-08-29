@@ -176,16 +176,18 @@ async function appendImagePage(pdfDoc, dataUrlOrBytes, isPng) {
  * options:
  *  - profile: profile-template.json 結構
  *  - courses: [{ slug, data }] 依匯出順序排列
- *  - selectedReportPaths: 依 slug 對應要收錄的分組報告 PDF 路徑（fetch 取得 bytes）
+ *  - selectedReportPaths: 依 slug 對應要收錄的分組報告 PDF 路徑（fetch 取得 bytes，全班共用檔案）
  *  - selectedPhotoPaths: 要收錄的課堂照片路徑陣列
- *  - graduationPaths: { certificateImage, thesisPdf } 可選
+ *  - graduationCertificate: { dataUrl, isPng } 可選，個人畢業證書（瀏覽器記憶體內，非共用檔案）
+ *  - graduationThesis: { bytes } 可選，個人畢業論文（瀏覽器記憶體內，非共用檔案）
  */
 export async function generatePersonalizedPdf({
   profile,
   courses,
   selectedReportPaths = [],
   selectedPhotoPaths = [],
-  graduationPaths = {},
+  graduationCertificate = null,
+  graduationThesis = null,
 }) {
   const pdfDoc = await PDFDocument.create();
   const cjkFont = await embedChineseFont(pdfDoc);
@@ -211,20 +213,12 @@ export async function generatePersonalizedPdf({
     await appendImagePage(pdfDoc, bytes, photoPath.toLowerCase().endsWith('.png'));
   }
 
-  if (graduationPaths.certificateImage) {
-    const res = await fetch(withBasePath(graduationPaths.certificateImage));
-    const bytes = await res.arrayBuffer();
-    await appendImagePage(
-      pdfDoc,
-      bytes,
-      graduationPaths.certificateImage.toLowerCase().endsWith('.png')
-    );
+  if (graduationCertificate?.dataUrl) {
+    await appendImagePage(pdfDoc, graduationCertificate.dataUrl, graduationCertificate.isPng);
   }
 
-  if (graduationPaths.thesisPdf) {
-    const res = await fetch(withBasePath(graduationPaths.thesisPdf));
-    const bytes = await res.arrayBuffer();
-    await appendPdfBytes(pdfDoc, bytes);
+  if (graduationThesis?.bytes) {
+    await appendPdfBytes(pdfDoc, graduationThesis.bytes);
   }
 
   return pdfDoc.save();

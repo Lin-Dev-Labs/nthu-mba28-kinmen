@@ -3,10 +3,11 @@ import ProfileForm from '../components/ProfileForm';
 import { generatePersonalizedPdf, downloadPdfBytes } from '../components/PdfGenerator';
 import profileTemplate from '../data/profile-template.json';
 import { getAllCourses } from '../lib/courses';
+import { useGraduation } from '../lib/GraduationContext';
 
 const STORAGE_KEY = 'mba-profile';
 
-export default function Download({ courses, reportSlugs, photoPaths, graduationPaths }) {
+export default function Download({ courses, reportSlugs, photoPaths }) {
   const [profile, setProfile] = useState(profileTemplate);
   const [selectedCourses, setSelectedCourses] = useState(() =>
     Object.fromEntries(courses.map((c) => [c.slug, true]))
@@ -17,7 +18,8 @@ export default function Download({ courses, reportSlugs, photoPaths, graduationP
   const [selectedPhotos, setSelectedPhotos] = useState(() =>
     Object.fromEntries(photoPaths.map((p) => [p, false]))
   );
-  const [includeGraduation, setIncludeGraduation] = useState(false);
+  const { certificate, thesis } = useGraduation();
+  const [includeGraduation, setIncludeGraduation] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
 
@@ -49,7 +51,8 @@ export default function Download({ courses, reportSlugs, photoPaths, graduationP
         courses: coursesToInclude,
         selectedReportPaths: reportPaths,
         selectedPhotoPaths: photosToInclude,
-        graduationPaths: includeGraduation ? graduationPaths : {},
+        graduationCertificate: includeGraduation ? certificate : null,
+        graduationThesis: includeGraduation ? thesis : null,
       });
 
       downloadPdfBytes(bytes, `${profile.name || '學習歷程'}.pdf`);
@@ -122,9 +125,9 @@ export default function Download({ courses, reportSlugs, photoPaths, graduationP
         </fieldset>
       )}
 
-      {(graduationPaths.certificateImage || graduationPaths.thesisPdf) && (
+      {(certificate || thesis) && (
         <fieldset>
-          <legend>畢業證書 / 論文</legend>
+          <legend>我的畢業證書 / 論文</legend>
           <label className="checkbox-row">
             <input
               type="checkbox"
@@ -134,6 +137,11 @@ export default function Download({ courses, reportSlugs, photoPaths, graduationP
             收錄畢業證書與論文
           </label>
         </fieldset>
+      )}
+      {!certificate && !thesis && (
+        <p>
+          尚未上傳畢業證書/論文，如果要收錄進 PDF，請先到「我的畢業證書/論文」頁面上傳（同一分頁內有效）。
+        </p>
       )}
 
       <button onClick={handleGenerate} disabled={generating}>
@@ -160,17 +168,5 @@ export async function getStaticProps() {
 
   const photoPaths = courses.flatMap((c) => c.data.photos || []);
 
-  const graduationDir = path.join(process.cwd(), 'public', 'graduation');
-  let graduationPaths = {};
-  if (fs.existsSync(graduationDir)) {
-    const files = fs.readdirSync(graduationDir);
-    const cert = files.find((f) => /\.(png|jpe?g)$/i.test(f));
-    const thesis = files.find((f) => f.endsWith('.pdf'));
-    graduationPaths = {
-      certificateImage: cert ? `/graduation/${cert}` : null,
-      thesisPdf: thesis ? `/graduation/${thesis}` : null,
-    };
-  }
-
-  return { props: { courses, reportSlugs, photoPaths, graduationPaths } };
+  return { props: { courses, reportSlugs, photoPaths } };
 }

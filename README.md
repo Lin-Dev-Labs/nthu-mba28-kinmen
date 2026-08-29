@@ -29,9 +29,9 @@ npm run build
 ## 內容維護
 
 - `data/courses/course-XX.json`：新增課程只需新增 json 檔，不用改程式碼
-- `public/reports/course-XX-*.pdf`：分組報告 PDF，檔名需以對應課程 slug（如 `course-01`）開頭
-- `public/graduation/`：放置畢業證書圖片與畢業論文 PDF
-- `public/images/courses/`：課堂照片，並在對應 `course-XX.json` 的 `photos` 欄位填入路徑
+- `public/reports/course-XX-*.pdf`：**全班/分組共用**的分組報告 PDF，檔名需以對應課程 slug（如 `course-01`）開頭，由 repo 管理者上傳一次
+- `public/images/courses/`：**全班共用**的課堂照片，並在對應 `course-XX.json` 的 `photos` 欄位填入路徑，由 repo 管理者上傳一次
+- **畢業證書/論文不是共用檔案**——每個人的證書、論文都不一樣，改成同學自己在「我的畢業證書/論文」頁面用瀏覽器上傳，只存在自己這次瀏覽的分頁記憶體裡，不會進這個 repo
 
 ## 檔案大小
 
