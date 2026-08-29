@@ -65,18 +65,12 @@ async function buildCoverPage(pdfDoc, font, boldFont, profile) {
   y -= 40;
 
   if (profile.photo && profile.photo.startsWith('data:image')) {
-    try {
-      const isPng = profile.photo.includes('image/png');
-      const image = isPng
-        ? await pdfDoc.embedPng(profile.photo)
-        : await pdfDoc.embedJpg(profile.photo);
-      const imgWidth = 120;
-      const imgHeight = (image.height / image.width) * imgWidth;
-      page.drawImage(image, { x: MARGIN, y: y - imgHeight, width: imgWidth, height: imgHeight });
-      y -= imgHeight + 20;
-    } catch (err) {
-      console.warn('個人照片嵌入失敗', err);
-    }
+    // ProfileForm 已統一把上傳照片轉成 PNG dataURL（見 lib/imageUtils.js），這裡直接用 embedPng
+    const image = await pdfDoc.embedPng(profile.photo);
+    const imgWidth = 120;
+    const imgHeight = (image.height / image.width) * imgWidth;
+    page.drawImage(image, { x: MARGIN, y: y - imgHeight, width: imgWidth, height: imgHeight });
+    y -= imgHeight + 20;
   }
 
   page.drawText('學歷', { x: MARGIN, y, size: 14, font: boldFont || font });

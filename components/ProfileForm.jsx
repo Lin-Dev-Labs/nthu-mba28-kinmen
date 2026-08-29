@@ -1,16 +1,9 @@
-import { useRef } from 'react';
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+import { useRef, useState } from 'react';
+import { normalizeImageToPngDataUrl } from '../lib/imageUtils';
 
 export default function ProfileForm({ profile, onChange }) {
   const fileInputRef = useRef(null);
+  const [photoError, setPhotoError] = useState(null);
 
   function update(field, value) {
     onChange({ ...profile, [field]: value });
@@ -34,8 +27,13 @@ export default function ProfileForm({ profile, onChange }) {
   async function handlePhotoChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const base64 = await fileToBase64(file);
-    update('photo', base64);
+    setPhotoError(null);
+    try {
+      const pngDataUrl = await normalizeImageToPngDataUrl(file);
+      update('photo', pngDataUrl);
+    } catch (err) {
+      setPhotoError(err.message);
+    }
   }
 
   return (
@@ -58,6 +56,7 @@ export default function ProfileForm({ profile, onChange }) {
           onChange={handlePhotoChange}
         />
       </label>
+      {photoError && <p className="error">{photoError}</p>}
       {profile.photo && !profile.photo.startsWith('/') && (
         <img src={profile.photo} alt="個人照片預覽" className="photo-preview" />
       )}

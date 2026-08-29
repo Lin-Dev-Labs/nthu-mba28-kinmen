@@ -58,7 +58,7 @@ export default function Download({ courses, reportSlugs, photoPaths }) {
       downloadPdfBytes(bytes, `${profile.name || '學習歷程'}.pdf`);
     } catch (err) {
       console.error(err);
-      setError('PDF 生成失敗，請確認資料格式或稍後再試');
+      setError(err.message || 'PDF 生成失敗，請確認資料格式或稍後再試');
     } finally {
       setGenerating(false);
     }

@@ -1,15 +1,7 @@
 import { useState } from 'react';
 import PdfModal from '../components/PdfModal';
 import { useGraduation } from '../lib/GraduationContext';
-
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+import { normalizeImageToPngDataUrl } from '../lib/imageUtils';
 
 function fileToArrayBuffer(file) {
   return new Promise((resolve, reject) => {
@@ -24,12 +16,18 @@ export default function Graduation() {
   const { certificate, setCertificate, thesis, setThesis } = useGraduation();
   const [showThesis, setShowThesis] = useState(false);
   const [thesisPreviewUrl, setThesisPreviewUrl] = useState(null);
+  const [certificateError, setCertificateError] = useState(null);
 
   async function handleCertificateChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataUrl = await fileToDataUrl(file);
-    setCertificate({ dataUrl, isPng: file.type === 'image/png' });
+    setCertificateError(null);
+    try {
+      const dataUrl = await normalizeImageToPngDataUrl(file);
+      setCertificate({ dataUrl, isPng: true });
+    } catch (err) {
+      setCertificateError(err.message);
+    }
   }
 
   async function handleThesisChange(e) {
@@ -66,6 +64,7 @@ export default function Graduation() {
           選擇圖片檔（jpg / png）
           <input type="file" accept="image/*" onChange={handleCertificateChange} />
         </label>
+        {certificateError && <p className="error">{certificateError}</p>}
         {certificate && (
           <img src={certificate.dataUrl} alt="我的畢業證書" className="certificate-image" />
         )}
